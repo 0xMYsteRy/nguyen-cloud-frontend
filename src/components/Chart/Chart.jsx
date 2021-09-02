@@ -6,16 +6,16 @@ import  styles from './Chart.module.css';
 
 const Chart = () => {
 
-    // 
+        // 
     const [dailyData, setDailyData] = useState({});
     useEffect(()  => {
         const fetchAPI = async () => {
             setDailyData(await fetchDailyData);
         }
 
-        console.log(dailyData);
+        // console.log(dailyData);
 
-        fetchAPI();
+        // fetchAPI();
     });
 
     // Line chart
