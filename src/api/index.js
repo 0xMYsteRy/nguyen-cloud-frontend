@@ -1,43 +1,45 @@
+
+
+
 import axios from 'axios';
-import { useState, useEffect } from "react";
 
-// My IP got ban due to fetching too much, check this with yours if still work
-// const test_url='https://covid19.mathdro.id/api' //John Hospkin API;
+// const test_url='https://covid19.mathdro.id/api';
+// const test_url='https://isnxkflyz4.execute-api.us-east-1.amazonaws.com/prod/covids';
+const url = 'https://covid19.mathdro.id/api';
 
-const url = 'https://isnxkflyz4.execute-api.us-east-1.amazonaws.com/prod/covids';
+export const fetchData = async (country) => {
+  let changeableUrl = url;
 
-export default function CountriesSummary() {
-    const [countriesSummary, setCountriesSummary] = useState([]);
-    useEffect(() => {
-      axios
-        .get('https://isnxkflyz4.execute-api.us-east-1.amazonaws.com/prod/covids')
-        .then((res) => {
-          setCountriesSummary(res.data.CovidSummarys);
-      
-        })
-        .catch((err) => console.error(err))
-    }, []
-    )
-}    
-// Async data
-export const fetchData = async () => {
-    try{
-        const { CovidSummarys: {confirmed, recovered, deaths, lastUpdate}} = await axios.get(url);
+  if (country) {
+    changeableUrl = `${url}/countries/${country}`;
+  }
 
-        // Destruct data
-        const modifiedData = {confirmed, recovered, deaths, lastUpdate};
-        
-        return modifiedData;
-    } catch (error) {}
-}
+  try {
+    const { data: { confirmed, recovered, deaths, lastUpdate } } = await axios.get(changeableUrl);
 
+    return { confirmed, recovered, deaths, lastUpdate };
+  } catch (error) {
+    return error;
+  }
+};
+
+// Instead of Global, it fetches the daily data for the US
 export const fetchDailyData = async () => {
     try {
-        const data = await axios.get(`${url}:/daily`);
-
-        console.log(data);
-
-    } catch (error){
-
+      const { data } = await axios.get('https://api.covidtracking.com/v1/us/daily.json');
+  
+      return data.map(({ positive, recovered, death, dateChecked: date }) => ({ confirmed: positive, recovered, deaths: death, date }));
+    } catch (error) {
+      return error;
     }
-}
+  };
+
+export const fetchCountries = async () => {
+  try {
+    const { data: { countries } } = await axios.get(`${url}/countries`);
+
+    return countries.map((country) => country.name);
+  } catch (error) {
+    return error;
+  }
+};
