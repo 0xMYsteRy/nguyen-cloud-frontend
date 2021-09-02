@@ -6,8 +6,10 @@ import cx from 'classnames';
 
 import styles from './Cards.module.css';
 
+
+// const Cards = (props) => {
 const Cards = ({ data : {confirmed, recovered, lastUpdate, deaths }}) => {
-    // console.log(props);
+    //console.log(props);
 
     if (!confirmed) {
         return "Loading . . . ";

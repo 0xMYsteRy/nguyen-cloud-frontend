@@ -1,26 +1,45 @@
+
+
+
 import axios from 'axios';
 
+// const test_url='https://covid19.mathdro.id/api';
+// const test_url='https://isnxkflyz4.execute-api.us-east-1.amazonaws.com/prod/covids';
 const url = 'https://covid19.mathdro.id/api';
 
-// Async data
-export const fetchData = async () => {
-    try{
-        const { data: {confirmed, recovered, deaths, lastUpdate}} = await axios.get(url);
+export const fetchData = async (country) => {
+  let changeableUrl = url;
 
-        // Destruct data
-        const modifiedData = {confirmed, recovered, deaths, lastUpdate};
-        
-        return modifiedData;
-    } catch (error) {}
-}
+  if (country) {
+    changeableUrl = `${url}/countries/${country}`;
+  }
 
+  try {
+    const { data: { confirmed, recovered, deaths, lastUpdate } } = await axios.get(changeableUrl);
+
+    return { confirmed, recovered, deaths, lastUpdate };
+  } catch (error) {
+    return error;
+  }
+};
+
+// Instead of Global, it fetches the daily data for the US
 export const fetchDailyData = async () => {
     try {
-        const data = await axios.get(`${url}:/daily`);
-
-        console.log(data);
-
-    } catch (error){
-
+      const { data } = await axios.get('https://api.covidtracking.com/v1/us/daily.json');
+  
+      return data.map(({ positive, recovered, death, dateChecked: date }) => ({ confirmed: positive, recovered, deaths: death, date }));
+    } catch (error) {
+      return error;
     }
-}
+  };
+
+export const fetchCountries = async () => {
+  try {
+    const { data: { countries } } = await axios.get(`${url}/countries`);
+
+    return countries.map((country) => country.name);
+  } catch (error) {
+    return error;
+  }
+};
